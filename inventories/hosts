@@ -1,0 +1,12 @@
+[k8s-master]
+k8s-master ansible_host="{{ k8s_master_ip }}"
+
+[k8s-nodes]
+k8s-node1 ansible_host="{{ k8s_node1_ip }}"
+k8s-node2 ansible_host="{{ k8s_node2_ip }}"
+
+[new-master]
+
+[new-nodes]
+
+

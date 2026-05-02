@@ -1,0 +1,37 @@
+---
+- name: Initialize Kubernetes master node
+  shell: |
+    kubeadm init \
+      --apiserver-advertise-address={{ k8s_master_ip }} \
+      --kubernetes-version {{ k8s_version }} \
+      --service-cidr {{ service_cidr }} \
+      --pod-network-cidr {{ pod_network_cidr }} 
+  register: init_output
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: /{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Copy kubeconfig to user's home
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Copy kubeconfig to user's home
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Generate node join
+  shell: |
+     kubeadm token create --print-join-command > /etc/kubernetes/kubeadm_join.sh

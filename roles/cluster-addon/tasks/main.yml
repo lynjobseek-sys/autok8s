@@ -1,0 +1,24 @@
+- name: Copy prometheus crd to master node
+  ansible.builtin.copy:
+    src: files/kube-prometheus/setup
+    dest: "{{ k8s_apply_prometheus_file }}"
+    mode: '0644'
+
+- name: Apply prometheus crd
+  ansible.builtin.shell: |
+    kubectl apply --server-side -f {{ k8s_apply_prometheus_file }}/setup 
+  register: apply_output
+
+
+- name: Copy prometheus to master node
+  ansible.builtin.copy:
+    src: files/kube-prometheus/
+    dest: "{{ k8s_apply_prometheus_file }}/kube-prometheus"
+    mode: '0644'
+
+- name: Apply prometheus
+  ansible.builtin.shell: |
+    kubectl apply -f {{ k8s_apply_prometheus_file }}/kube-prometheus 
+  register: apply_output
+
+

@@ -1,0 +1,63 @@
+---
+k8s_version: "v1.28.2"
+calico_version: "v3.27.3"
+pod_network_cidr: "10.244.0.0/16"
+service_cidr: "10.96.0.0/12"
+kubelet_root_dir: "/var/lib/kubelet"
+
+# IP Addresses
+
+
+k8s_master_ip: "10.211.55.13"
+k8s_node1_ip: "10.211.55.15"
+k8s_node2_ip: "10.211.55.16"
+
+
+
+containerd_use_systemd_cgroup: "true"
+
+# Set calico network backend: bird, vxlan, none
+
+# Deploy Directory (kubeasz workspace)
+base_dir: "/root/autok8s"
+
+# Directory for a specific cluster
+cluster_dir: "{{ base_dir }}/clusters/_cluster_name_"
+
+
+calico_backend: bird
+calico_ipv4pool_ipip: "Always"
+# calico mtu
+calico_veth_mtu: 0
+# calico images
+calico_cni_image: "docker.io/calico/cni:v3.28.0"
+calico_node_image: "docker.io/calico/node:v3.28.0"
+calico_typha_image: "docker.io/calico/typha:v3.28.0"
+calico_kube_controllers_image: "docker.io/calico/kube-controllers:v3.28.0"
+# calicoctl image
+calicoctl_image: "docker.io/calico/ctl:v3.28.0"
+# Set Felix log level(debug, info, warning, error)
+calico_felix_log_level: "warning"
+
+kube_pod_subnet: "10.244.0.0/18"
+
+kube_service_subnet: "10.244.64.0/18"
+kube_network_node_prefix: "24"
+
+kube_max_pods: "110"
+
+network_plugin: "calico"
+
+kube_service_node_port_range: 30000-32767
+
+
+wait_plugins_ready: true
+
+
+k8s_apply_calico_file: "~/.kube"
+
+k8s_apply_nginx_file: "~/.kube"
+
+k8s_apply_prometheus_file: "~/.kube"
+
+k8s_apply_cosmos_file: "~/.kube"

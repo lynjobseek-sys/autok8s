@@ -1,0 +1,52 @@
+- name: Check Docker
+  shell: >
+    systemctl is-active docker || echo "not running"
+  register: docker_already_running
+
+- name: Set container_manager_detected configure
+  set_fact:
+    container_manager_detected: >-
+      {%- if docker_already_running.stdout == "active" -%}
+      docker
+      {%- else -%}
+      containerd
+      {%- endif -%}
+
+- name: Create kubernetes folder
+  file: 
+    name: "{{ item }}"
+    state: directory
+  with_items:
+  - "{{ kubelet_root_dir }}"
+  - /etc/kubernetes
+  - /usr/share/bash-completion/completions
+
+- name: Read kubelet.conf stat info
+  stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: kubelet_conf_stat
+
+# - include_tasks: "{{ (role_path + '/../kube-master/tasks/kubeadm-config.yml') | realpath  }}"
+#- name: Copy kubeconfig to user's home
+  # copy:
+    #    src: /etc/kubernetes/kubeadm_join.sh
+      #    dest: /etc/kubernetes/kubeadm_join.sh
+      #    remote_src: yes
+- name: kubeadm_join sh
+  copy: src=/etc/kubernetes/kubeadm_join.sh dest=/etc/kubernetes mode=0755
+
+- block:
+  - name: Confirm kubelet stopped
+    service:
+      name: kubelet
+      state: stopped
+      enabled: yes
+
+  - name: Worker join cluster
+    shell: >
+      bash -x /etc/kubernetes/kubeadm_join.sh
+    ignore_errors: no
+  when: 
+  - not kubelet_conf_stat.stat.exists
+
+

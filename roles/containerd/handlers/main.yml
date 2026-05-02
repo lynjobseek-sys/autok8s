@@ -1,0 +1,14 @@
+---
+
+
+- name: Restart containerd
+  become: yes
+  command: systemctl restart containerd.service
+
+
+
+
+- name: Restart kubelet
+  become: yes
+  command: systemctl restart kubelet.service
+ 

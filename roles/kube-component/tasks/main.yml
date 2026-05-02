@@ -1,0 +1,30 @@
+---
+- name: Add Kubernetes APT repository
+  block:
+   
+    - name: Add APT key
+      ansible.builtin.shell: |
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: Add Kubernetes APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /"
+        state: present
+        filename: 'kubernetes'
+
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+
+    - name: Install Kubernetes packages
+      apt:
+        name:
+          - kubelet=1.28.2-1.1 
+          - kubeadm=1.28.2-1.1 
+          - kubectl=1.28.2-1.1
+        state: present
+
+    - name: Enable kubelet
+      systemd:
+        name: kubelet
+        enabled: yes

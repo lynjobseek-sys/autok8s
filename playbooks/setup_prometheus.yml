@@ -1,0 +1,10 @@
+- hosts:
+  - k8s-master
+  roles:
+  - cluster-addon
+
+#example-nginx
+- hosts:
+  - k8s-master
+  roles:
+  - example-nginx

@@ -1,0 +1,15 @@
+---
+- name: Copy Kubernetes configuration file to master node
+  ansible.builtin.copy:
+    src: files/calico.yaml
+    dest: "{{ k8s_apply_calico_file }}"
+    mode: '0644'
+
+- name: Apply Kubernetes configuration
+  ansible.builtin.shell: |
+    kubectl apply -f {{ k8s_apply_calico_file }}/calico.yaml 
+  register: apply_output
+
+- name: Show kubectl apply output
+  debug:
+    var: apply_output.stdout

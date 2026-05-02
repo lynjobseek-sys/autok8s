@@ -1,0 +1,5 @@
+---
+- name: Kubeadm reset all
+  ansible.builtin.shell: |
+    kubeadm reset --force
+  register: reset_output

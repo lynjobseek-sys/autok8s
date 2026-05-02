@@ -1,0 +1,82 @@
+---
+- block:
+  - name: 
+    shell: >
+      systemctl is-active ufw | grep active || echo "not be found"
+    register: ufw_already_installed
+  
+  - name: Disable firewall
+    service:
+      name: ufw
+      state: stopped
+      enabled: no
+    when: ufw_already_installed.stdout == "active"
+  when: "firewalld_disabled | default(True) | bool"
+
+- name: Disable swap
+  shell: "swapoff -a && sysctl -w vm.swappiness=0"
+  ignore_errors: true
+
+- name: Delete fstab swap configure
+  lineinfile:
+    path: /etc/fstab
+    regexp: 'swap'
+    state: absent
+    backup: yes
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Add host entries
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+  with_items:
+    - "{{ k8s_master_ip }} k8s-master"
+    - "{{ k8s_node1_ip }} k8s-node1"
+    - "{{ k8s_node2_ip }} k8s-node2"
+
+- name: Add system configure
+  template: 
+    src: 95-k8s-sysctl.conf.j2 
+    dest: /etc/sysctl.d/95-k8s-sysctl.conf
+
+- name: Set system configure
+  shell: "sysctl -p /etc/sysctl.d/95-k8s-sysctl.conf"
+  ignore_errors: true
+
+    #- name: Synchronize time
+    # apt:
+    # name: ntpdate
+    #state: present
+
+    #- name: Sync time with time.windows.com
+  #  command: ntpdate time.windows.com
+- name: enable br_netfilter
+  shell: "modprobe  br_netfilter"
+
+- name: Install basic package
+  apt: 
+    name:
+    - jq                          
+    - git
+    - htop
+    - curl                        
+    - socat                       
+    - ipset                       
+    - iotop
+    - sysstat
+    - ipvsadm                     
+    - conntrack                   
+    - net-tools
+    - nfs-common                  
+    - libseccomp2                 
+    - netcat-openbsd              
+    - ca-certificates             
+    - bash-completion             
+    - apt-transport-https  
+    - software-properties-common       
+
+    state: present
+    update_cache: yes

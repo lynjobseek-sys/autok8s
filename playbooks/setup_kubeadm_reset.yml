@@ -1,0 +1,5 @@
+- hosts:
+  - k8s-master
+  - k8s-nodes
+  roles:
+  - kubeadm-reset

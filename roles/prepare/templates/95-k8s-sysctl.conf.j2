@@ -1,0 +1,59 @@
+# Maximize the use of physical memory
+vm.swappiness = 0
+
+# Decide on the interval to check the validity of adjacent layer records. When an adjacent layer record becomes invalid, it will be parsed again before sending data to it. The default value is 60 seconds.
+net.ipv4.neigh.default.gc_stale_time = 120
+
+# see details in https://help.aliyun.com/knowledge_detail/39428.html
+net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.default.arp_announce = 2
+net.ipv4.conf.lo.arp_announce = 2
+net.ipv4.conf.all.arp_announce = 2
+
+# see details in https://help.aliyun.com/knowledge_detail/41334.html
+net.ipv4.tcp_max_tw_buckets = 5000
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_syn_backlog = 1024
+net.ipv4.tcp_synack_retries = 2
+
+# For the container to access the external network, local system forwarding support is required.
+net.ipv4.ip_forward = 1
+
+# Occasionally, there are situations where the business domain name is inaccessible or connection times out.
+# refer to https://www.ziji.work/kubernetes/kubernetes_cannot_accesspod_port.html
+{% if ansible_distribution in ["CentOS","RedHat"] and ansible_kernel is version('4.12', '<') %}
+net.ipv4.tcp_tw_recycle = 0
+{% endif %}
+net.ipv4.tcp_tw_reuse = 0
+
+
+# Defines the maximum length of the listening queue for each port in the system. This is a global parameter with a default value of 128.
+net.core.somaxconn = 32768
+
+# When the server experiences a large volume of traffic, network connection packet loss occurs.
+# For more modern systems (Ubuntu 16+, CentOS 7+), on a 64-bit machine with 16GB of memory,
+# the max value is usually set to 524288, and the bucket value is 131072 (which can be modified in the sunrpc.conf file)
+# As the memory size doubles, these two values also double.
+# refer to https://testerhome.com/topics/15824
+
+
+# The maximum number of files that a single process can allocate: 
+fs.nr_open = 6553600
+# The system-level limit in Linux for the total number of file descriptors that all user processes can open.
+fs.file-max = 6553600
+
+
+vm.max_map_count = 655360
+
+vm.overcommit_memory = 1
+kernel.panic = 10
+kernel.panic_on_oops = 1
+
+
+fs.inotify.max_user_watches = 1048576
+
+
+fs.inotify.max_user_instances = 1048576
+fs.inotify.max_queued_events = 1048576
+fs.pipe-user-pages-soft=102400
